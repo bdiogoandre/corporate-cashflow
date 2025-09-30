@@ -1,4 +1,4 @@
-﻿using Corporate.Cashflow.Domain.Account;
+﻿using Corporate.Cashflow.Domain.Accounts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

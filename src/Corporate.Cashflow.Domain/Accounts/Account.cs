@@ -1,6 +1,6 @@
 ﻿using Corporate.Cashflow.Domain.Enums;
 
-namespace Corporate.Cashflow.Domain.Account
+namespace Corporate.Cashflow.Domain.Accounts
 {
     public class Account : BaseEntity
     {

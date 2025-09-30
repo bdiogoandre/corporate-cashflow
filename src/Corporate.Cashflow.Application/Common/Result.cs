@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Corporate.Cashflow.Application.Results
+namespace Corporate.Cashflow.Application.Common
 {
     public class Result<T>
     {

@@ -54,5 +54,6 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
         public string? Description { get; set; }
         public DateTime Date { get; set; }
         public ETransactionType TransactionType { get; set; }
+        public EPaymentMethod PaymentMethod { get; set; }
     }
 }

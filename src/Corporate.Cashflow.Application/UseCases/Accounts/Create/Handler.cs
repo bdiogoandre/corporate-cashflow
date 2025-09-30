@@ -1,6 +1,6 @@
-﻿using Corporate.Cashflow.Application.Interfaces;
-using Corporate.Cashflow.Application.Results;
-using Corporate.Cashflow.Domain.Account;
+﻿using Corporate.Cashflow.Application.Common;
+using Corporate.Cashflow.Application.Interfaces;
+using Corporate.Cashflow.Domain.Accounts;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Accounts.Create

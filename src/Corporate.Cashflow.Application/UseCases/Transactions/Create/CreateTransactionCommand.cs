@@ -1,4 +1,4 @@
-﻿using Corporate.Cashflow.Application.Results;
+﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Domain.Enums;
 using MediatR;
 
@@ -11,6 +11,7 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
         public DateTime Date { get; set; }
         public Guid AccountId { get; set; }
         public ETransactionType TransactionType { get; set; }
+        public EPaymentMethod PaymentMethod { get; set; }
     }
 
 }

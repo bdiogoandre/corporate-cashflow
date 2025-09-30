@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
+using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Application.Interfaces;
-using Corporate.Cashflow.Application.Results;
 using Corporate.Cashflow.Domain.Transactions;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +32,8 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
                 Amount = request.Amount,
                 Description = request.Description!,
                 TransactionType = request.TransactionType,
-                Date = request.Date
+                Date = request.Date,
+                PaymentMethod = request.PaymentMethod
             };
 
             _context.Transactions.Add(transaction);

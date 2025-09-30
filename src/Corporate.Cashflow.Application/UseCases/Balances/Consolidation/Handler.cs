@@ -1,5 +1,5 @@
 ﻿using Corporate.Cashflow.Application.Interfaces;
-using Corporate.Cashflow.Domain.Account;
+using Corporate.Cashflow.Domain.Accounts;
 using Corporate.Cashflow.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -27,6 +27,10 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
             RuleFor(x => x.TransactionType)
                 .IsInEnum()
                 .WithMessage("TransactionType must be a valid value.");
+
+            RuleFor(x => x.PaymentMethod)
+                .IsInEnum()
+                .WithMessage("PaymentMethod must be a valid value.");
         }
     }
 

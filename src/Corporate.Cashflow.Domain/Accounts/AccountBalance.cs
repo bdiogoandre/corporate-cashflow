@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Corporate.Cashflow.Domain.Account
+namespace Corporate.Cashflow.Domain.Accounts
 {
     public class AccountBalance : BaseEntity
     {

@@ -1,4 +1,4 @@
-﻿using Corporate.Cashflow.Application.Results;
+﻿using Corporate.Cashflow.Application.Common;
 using FluentValidation;
 using MediatR;
 

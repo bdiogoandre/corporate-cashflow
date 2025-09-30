@@ -22,8 +22,6 @@
 
   <ItemGroup>
     <Folder Include="UseCases\Balances\Get\" />
-    <Folder Include="UseCases\Transactions\GetById\" />
-    <Folder Include="UseCases\Transactions\GetAll\" />
   </ItemGroup>
 
   <ItemGroup>

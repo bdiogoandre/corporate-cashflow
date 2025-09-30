@@ -1,4 +1,5 @@
 ﻿using CashFlow.Api.Endpoints;
+using Corporate.CashFlow.Api.Endpoints.Accounts;
 using Corporate.CashFlow.Api.Endpoints.Transactions;
 
 namespace Corporate.CashFlow.Api.Endpoints
@@ -13,7 +14,9 @@ namespace Corporate.CashFlow.Api.Endpoints
                                 .ProducesValidationProblem();
 
 
-            var accounts = rootRoutes.MapGroup("/accounts");
+            var accounts = rootRoutes.MapGroup("/accounts")
+                                .MapCreateAccountEndpoint()
+                                .MapGetAccountByIdEndpoint();
 
             accounts.MapGroup("{accountId:guid}/transactions")
                     .MapCreateTransactionEndpoints();

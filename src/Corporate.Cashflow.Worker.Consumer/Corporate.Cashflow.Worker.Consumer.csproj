@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Corporate.Cashflow.Domain\Corporate.Cashflow.Domain.csproj" />
     <ProjectReference Include="..\Corporate.Cashflow.Infraestructure\Corporate.Cashflow.Infraestructure.csproj" />
   </ItemGroup>
 

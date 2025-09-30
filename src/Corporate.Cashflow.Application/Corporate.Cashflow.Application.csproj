@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
@@ -18,8 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\Accounts\Create\" />
-    <Folder Include="UseCases\Accounts\GetById\" />
     <Folder Include="UseCases\Balances\Get\" />
     <Folder Include="UseCases\Transactions\GetById\" />
     <Folder Include="UseCases\Transactions\GetAll\" />

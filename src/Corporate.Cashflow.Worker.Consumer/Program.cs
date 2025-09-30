@@ -1,4 +1,5 @@
 using Corporate.Cashflow.Application;
+using Corporate.Cashflow.Domain;
 using Corporate.Cashflow.Infraestructure;
 using Corporate.Cashflow.Infraestructure.Kafka;
 using Corporate.Cashflow.Worker.Consumer;
@@ -9,7 +10,10 @@ var bootstrapServers = builder.Configuration["Kafka:BootstrapServers"]!;
 var topic = builder.Configuration["Kafka:Topic"]!;
 
 // Usado com o propósito único de 
-await KafkaSetup.EnsureTopicExists(bootstrapServers, topic);
+await KafkaSetup.EnsureTopicExists(bootstrapServers, topic, 2, 3);
+
+
+builder.Services.AddScoped<IGetIdentifier, GetAapplicationNameIdentifier>();
 
 builder.Services.AddHostedService<CashflowConsumerService>();
 

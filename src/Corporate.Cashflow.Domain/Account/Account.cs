@@ -1,8 +1,11 @@
-﻿namespace Corporate.Cashflow.Domain.Account
+﻿using Corporate.Cashflow.Domain.Enums;
+
+namespace Corporate.Cashflow.Domain.Account
 {
-    public class Account
+    public class Account : BaseEntity
     {
-        public Guid AccountId { get; set; }
-        public required string OwnnerName { get; set; }
+        public Guid UserId { get; set; }
+        public required string Name { get; set; }
+        public ECurrency Currency { get; set; }
     }
 }

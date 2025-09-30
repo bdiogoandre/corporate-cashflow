@@ -1,61 +1,56 @@
 ﻿using Confluent.Kafka;
 using Corporate.Cashflow.Application.Interfaces;
+using Corporate.Cashflow.Application.Results;
 using Corporate.Cashflow.Domain.Transactions;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
 {
-    public class Handler : IRequestHandler<CreateTransactionCommand, CreateTransactionCommandResponse>
+    public class Handler : IRequestHandler<CreateTransactionCommand, Result<Guid>>
     {
         private readonly IProducer<string, string> _producer;
         private readonly ICashflowDbContext _context;
+        private readonly string _topic;
 
-        public Handler(IProducer<string, string> producer, ICashflowDbContext context)
+        public Handler(IProducer<string, string> producer, ICashflowDbContext context, IConfiguration configuration)
         {
             _producer = producer;
             _context = context;
+            _topic = configuration["Kafka:Topic"]!;
         }
 
-        public async Task<CreateTransactionCommandResponse> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
         {
             // Verificar Account
 
-            // Validar
 
-            var transaction = new TransactionEntity
+            var transaction = new Transaction
             {
                 AccountId = request.AccountId,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = "system",
-                Data = JsonSerializer.Serialize(new TransactionData { Amount = request.Amount, Description = request.Description }),
-                Date = request.Date,
-                Id = Guid.NewGuid()
+                Amount = request.Amount,
+                Description = request.Description!,
+                TransactionType = request.TransactionType,
+                Date = request.Date
             };
 
             _context.Transactions.Add(transaction);
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var result = await _producer.ProduceAsync("cashflow-events", new Message<string, string>
+            var result = await _producer.ProduceAsync(_topic, new Message<string, string>
             {
                 Key = transaction.AccountId.ToString(),
-                Value = JsonSerializer.Serialize(new
-                {
-                    transaction.Id,
-                    transaction.AccountId,
-                    transaction.Date,
-                    Data = JsonSerializer.Deserialize<TransactionData>(transaction.Data!)
-                })
+                Value = JsonSerializer.Serialize(transaction),
+                Timestamp = new Timestamp(DateTime.UtcNow)
             }, cancellationToken);
 
             if(result.Status != PersistenceStatus.Persisted)
-            {
-                throw new Exception("Failed to produce message");
-            }
+                return Result<Guid>.Failure("Failed to produce message to Kafka");
+            
 
-
-            return new CreateTransactionCommandResponse(transaction.Id);
+            return Result<Guid>.Success(transaction.Id);
         }
     }
 }

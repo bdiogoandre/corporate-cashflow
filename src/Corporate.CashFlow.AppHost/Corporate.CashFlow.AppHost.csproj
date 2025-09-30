@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Corporate.CashFlow.Api\Corporate.CashFlow.Api.csproj" />
     <ProjectReference Include="..\Corporate.Cashflow.Worker.Consumer\Corporate.Cashflow.Worker.Consumer.csproj" />
+    <ProjectReference Include="..\IdentityServicer\Corporate.Cashflow.IdentityService.Api\Corporate.Cashflow.IdentityServer.Api.csproj" />
   </ItemGroup>
 
 </Project>

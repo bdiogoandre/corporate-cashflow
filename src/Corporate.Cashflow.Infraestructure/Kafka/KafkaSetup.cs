@@ -24,15 +24,14 @@ namespace Corporate.Cashflow.Infraestructure.Kafka
                     return;
                 }
 
-                await adminClient.CreateTopicsAsync(new TopicSpecification[]
-                {
-                    new TopicSpecification
-                    {
+                await adminClient.CreateTopicsAsync(
+                [
+                    new() {
                         Name = topicName,
                         NumPartitions = numPartitions,
                         ReplicationFactor = replicationFactor
                     }
-                });
+                ]);
 
                 Console.WriteLine($"[Kafka] Topic {topicName} created with {numPartitions} partitions.");
             }

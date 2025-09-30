@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Corporate.Cashflow.Infraestructure.Migrations
 {
     [DbContext(typeof(CashflowDbContext))]
-    [Migration("20250930062951_InitialMigration")]
+    [Migration("20250930150837_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Corporate.Cashflow.Domain.Account.AccountBalanceEntity", b =>
+            modelBuilder.Entity("Corporate.Cashflow.Domain.Account.AccountBalance", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +69,7 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
                     b.ToTable("AccountBalances", (string)null);
                 });
 
-            modelBuilder.Entity("Corporate.Cashflow.Domain.Transactions.TransactionEntity", b =>
+            modelBuilder.Entity("Corporate.Cashflow.Domain.Transactions.Transaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,20 +78,24 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("Data")
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("Sequence")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

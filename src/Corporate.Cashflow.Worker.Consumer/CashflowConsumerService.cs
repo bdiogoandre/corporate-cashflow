@@ -1,8 +1,11 @@
 ﻿using Confluent.Kafka;
 using Corporate.Cashflow.Application.UseCases.Balances.Consolidation;
+using Corporate.Cashflow.Domain.Transactions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Polly;
+using Polly.Retry;
+using System.Text.Json;
 
 namespace Corporate.Cashflow.Worker.Consumer
 {
@@ -40,24 +43,18 @@ namespace Corporate.Cashflow.Worker.Consumer
                     {
                         _logger.LogInformation($"[Kafka] Consumed message '{consumeResult.Message.Value}' at: '{consumeResult.TopicPartitionOffset}'.");
 
-                        var retryPolicy = Policy
-                            .Handle<DbUpdateConcurrencyException>()
-                            .WaitAndRetry(new[]
-                            {
-                        TimeSpan.FromSeconds(1),
-                        TimeSpan.FromSeconds(2),
-                        TimeSpan.FromSeconds(3)
-                            },
-                            (exception, timeSpan, retryCount, context) =>
-                            {
-                                _logger.LogWarning($"[Kafka] Concurrency conflict detected. Retrying {retryCount}/3 after {timeSpan.TotalSeconds} seconds.");
-                            });
+                        var retryPolicy = CreateConcurrencyRetryPolicy();
+
+                        var transaction = JsonSerializer.Deserialize<Transaction>(consumeResult.Message.Value);
 
                         var command = new ConsolidationCommand
                         {
                             AccountId = Guid.Parse(consumeResult.Message.Key),
                             Date = DateTime.UtcNow,
-                            Data = consumeResult.Message.Value
+                            Amount = transaction!.Amount,
+                            TransactionId = transaction.Id,
+                            Description = transaction.Description,
+                            TransactionType = transaction.TransactionType
                         };
 
                         using var scope = _serviceProvider.CreateScope();
@@ -84,6 +81,23 @@ namespace Corporate.Cashflow.Worker.Consumer
             _consumer.Close();
             _consumer.Dispose();
             base.Dispose();
+        }
+
+        private static RetryPolicy CreateConcurrencyRetryPolicy()
+        {
+            return Policy
+                .Handle<DbUpdateConcurrencyException>()
+                .WaitAndRetry(
+                    [
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(2),
+                        TimeSpan.FromSeconds(3)
+                    ],
+                    (exception, timeSpan, retryCount, context) =>
+                    {
+                        Console.WriteLine($"Concurrency conflict detected. Retrying {retryCount}/3 after {timeSpan.TotalSeconds} seconds.");
+                    }
+                );
         }
     }
 }

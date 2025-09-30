@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Corporate.Cashflow.Infraestructure.Data
 {
-    public class TransactionEntityConfiguration : IEntityTypeConfiguration<AccountBalanceEntity>
+    public class AccountBalanceEntityConfiguration : IEntityTypeConfiguration<AccountBalance>
     {
-        public void Configure(EntityTypeBuilder<AccountBalanceEntity> builder)
+        public void Configure(EntityTypeBuilder<AccountBalance> builder)
         {
             builder.ToTable("AccountBalances")
                 .Property<uint>("xmin")

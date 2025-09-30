@@ -26,5 +26,8 @@ if (app.Environment.IsDevelopment())
     await context.Database.MigrateAsync();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 await app.RunAsync();
 

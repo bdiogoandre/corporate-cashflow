@@ -14,6 +14,10 @@ var kafka = builder.AddKafka("Kafka", port: 9092)
                    .WithDataVolume(isReadOnly: false)
                    .WithKafkaUI();
 
+builder.AddProject<Projects.Corporate_Cashflow_IdentityServer_Api>("cashflow-identityserver-api")
+    .WithReference(identityServerSql)
+    .WaitFor(identityServerSql);
+
 
 builder.AddProject<Projects.Corporate_CashFlow_Api>("cash-flow-api")
     .WithReference(cashFlowSql)

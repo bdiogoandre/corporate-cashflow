@@ -1,4 +1,4 @@
-﻿namespace Corporate.Cashflow.Domain.Transactions
+﻿namespace Corporate.Cashflow.Domain.Enums
 {
     public enum ETransactionType
     {

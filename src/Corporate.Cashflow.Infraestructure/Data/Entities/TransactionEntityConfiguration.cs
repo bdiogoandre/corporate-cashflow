@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Corporate.Cashflow.Infraestructure.Data.Entities
 {
-    public class TransactionEntityConfiguration : IEntityTypeConfiguration<TransactionEntity>
+    public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transaction>
     {
-        public void Configure(EntityTypeBuilder<TransactionEntity> builder)
+        public void Configure(EntityTypeBuilder<Transaction> builder)
         {
             builder.ToTable("Transactions");
         }

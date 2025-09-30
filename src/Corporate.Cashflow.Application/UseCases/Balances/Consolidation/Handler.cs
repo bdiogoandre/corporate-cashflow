@@ -1,16 +1,16 @@
 ﻿using Corporate.Cashflow.Application.Interfaces;
-using Corporate.Cashflow.Domain.Transactions;
+using Corporate.Cashflow.Domain.Account;
+using Corporate.Cashflow.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidation
 {
-    public class ConsolidationHandler : IRequestHandler<ConsolidationCommand>
+    public class Handler : IRequestHandler<ConsolidationCommand>
     {
         private readonly ICashflowDbContext _context;
 
-        public ConsolidationHandler(ICashflowDbContext context)
+        public Handler(ICashflowDbContext context)
         {
             _context = context;
         }
@@ -20,11 +20,9 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidation
             var balance = await _context.AccountBalances
                 .FirstOrDefaultAsync(x => x.AccountId == request.AccountId && x.Date == DateOnly.FromDateTime(request.Date.Date), cancellationToken);
 
-            var transactionData = JsonSerializer.Deserialize<TransactionData>(request.Data!);
-
             if (balance == null)
             {
-                balance = new Domain.Account.AccountBalanceEntity
+                balance = new AccountBalance
                 {
                     AccountId = request.AccountId,
                     Date = DateOnly.FromDateTime(request.Date.Date),
@@ -35,19 +33,19 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidation
                 _context.AccountBalances.Add(balance);
             }
 
-            if (transactionData.TransactionType == ETransactionType.Inflow)
+            if (balance.LastTransactionId == request.TransactionId)
             {
-                balance.Inflows += transactionData.Amount;
-                balance.Balance += transactionData.Amount;
+                // Already processed this transaction
+                return;
             }
-            else if (transactionData.TransactionType == ETransactionType.Outflow)
-            {
-                balance.Outflows += transactionData.Amount;
-                balance.Balance -= transactionData.Amount;
-            }
+
+            if (request.TransactionType == ETransactionType.Inflow)
+                balance.CalculateInflow(request.Amount);
+            else
+                balance.CalculateOutflow(request.Amount);
+            
 
             // Verificar a inclusão do offset aqui
-
 
             await _context.SaveChangesAsync(cancellationToken);
 

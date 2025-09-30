@@ -1,7 +1,6 @@
 ﻿namespace Corporate.Cashflow.Application
 {
-    public class Class1
+    public interface IApplicationMarker
     {
-
     }
 }

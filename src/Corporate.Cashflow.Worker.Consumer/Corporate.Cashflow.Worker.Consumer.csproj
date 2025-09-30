@@ -7,15 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Polly" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Corporate.Cashflow.Application\Corporate.Cashflow.Application.csproj" />
     <ProjectReference Include="..\Corporate.Cashflow.Infraestructure\Corporate.Cashflow.Infraestructure.csproj" />
-    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿namespace Corporate.Cashflow.Domain.Transactions
 {
-    public class TransactionCreated : BaseEntity
+    public class TransactionEntity : BaseEntity
     {
         public Guid AccountId { get; set; }
         public DateTimeOffset Date { get; set; }

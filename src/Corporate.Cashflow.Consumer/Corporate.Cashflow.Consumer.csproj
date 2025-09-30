@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Stream.Client" />
+    <PackageReference Include="Aspire.Hosting.Kafka" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Polly" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Corporate.Cashflow.Application\Corporate.Cashflow.Application.csproj" />
+    <ProjectReference Include="..\Corporate.Cashflow.Infraestructure\Corporate.Cashflow.Infraestructure.csproj" />
   </ItemGroup>
 
 </Project>

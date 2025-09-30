@@ -7,7 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UseCases\Accounts\Create\" />
+    <Folder Include="UseCases\Accounts\GetById\" />
+    <Folder Include="UseCases\Balances\Get\" />
+    <Folder Include="UseCases\Transactions\GetById\" />
+    <Folder Include="UseCases\Transactions\GetAll\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Corporate.Cashflow.Domain\Corporate.Cashflow.Domain.csproj" />
   </ItemGroup>
 
 </Project>

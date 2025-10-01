@@ -75,6 +75,15 @@ Abra no navegador:
 
 ## 🚀 Fluxo de Execução de Uma Transação
 
+1. O usuário envia uma requisição para criar ou consultar transações.  
+2. O tráfego passa pelo **Firewall** e **API Gateway** para validação de segurança e roteamento.  
+3. As APIs processam a requisição:  
+   - **Escrita (Command)**: grava o evento no **Event Store** e publica no Kafka.  
+   - **Leitura (Query)**: consulta saldo ou histórico diretamente no banco projetado.  
+4. O **Consumer** consome eventos do Kafka, calcula o saldo diário e grava no **Consolidated DB**.  
+5. Todas as operações são monitoradas e logadas pelo **.NET Aspire**, garantindo observabilidade completa.  
+
+
 ```mermaid
 graph TD;
     Start([Usuário cria transação]) --> Auth{Token válido?}
@@ -119,6 +128,22 @@ graph TD;
 ```
 
 ## 🏗️ System Design
+
+Abaixo uma apresentação do System Design com elementos utilizados e outros que podem fazer parte em um ambiente de produção real. Items que não foram utilizados na solução estão marcados como
+
+### Componentes Principais
+
+- **Firewall / WAF**: protege contra ataques DDoS e tráfego malicioso <span style="color:#aa0000">**(Não utilizado)**</span>.
+- **API Gateway**: centraliza autenticação, autorização e controle de tráfego. <span style="color:#aa0000">**(Não utilizado)**</span>.
+- **Identity API**: gerencia autenticação e usuários.
+- **CashFlow API**: recebe e grava transações, publica eventos no Kafka.  
+- **Kafka**: mensageria confiável para processamento assíncrono e garantia de ordem via **Partition Key**.  
+- **Transaction Consumer**: processa eventos do Kafka, consolida saldo diário no banco de dados.  
+- **Event Store**: banco de eventos (PostgreSQL) que registra todas as transações.  
+- **Consolidated DB**: banco de dados para projeção do saldo diário consolidado, com **Optimistic Locking** para controle de concorrência.  
+- **.NET Aspire**: orquestra serviços distribuídos, coleta métricas, logs e traces distribuídos para observabilidade.  
+
+
 
 ```mermaid
 flowchart TD
@@ -205,7 +230,5 @@ O **Corporate CashFlow** é um sistema que:
 - **Gerencia fluxo de caixa** de empresas  
 - **Garante consistência e auditabilidade**  
 - **Escala horizontalmente** com Kafka  
-- **Mantém segurança** com JWT + bcrypt  
-
-👥 Público-alvo: empresas que buscam **controle financeiro robusto, alta disponibilidade e compliance**.  
+- **Mantém segurança** com JWT
 

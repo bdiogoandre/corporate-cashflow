@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Corporate.Cashflow.Application.Common;
+using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Balances.GetByDate
 {
-    class GetBalanceByDateQuery
+    public record GetBalanceByDateQuery(Guid AccountId, DateOnly Date) : IRequest<Result<GetBalanceByDateResponse>>;
+
+    public class GetBalanceByDateResponse
     {
+        public Guid AccountId { get; set; }
+        public DateOnly Date { get; set; }
+        public decimal Inflows { get; set; }
+        public decimal Outflows { get; set; }
+        public decimal Balance { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 using Corporate.Cashflow.Application;
-using Corporate.Cashflow.Domain;
+using Corporate.Cashflow.Application.Interfaces;
 using Corporate.Cashflow.Infraestructure;
 using Corporate.Cashflow.Infraestructure.Kafka;
 using Corporate.Cashflow.Worker.Consumer;

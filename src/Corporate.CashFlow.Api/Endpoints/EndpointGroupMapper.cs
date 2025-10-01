@@ -1,25 +1,28 @@
 ﻿using CashFlow.Api.Endpoints;
 using Corporate.CashFlow.Api.Endpoints.Accounts;
+using Corporate.CashFlow.Api.Endpoints.Balance;
 using Corporate.CashFlow.Api.Endpoints.Transactions;
 
 namespace Corporate.CashFlow.Api.Endpoints
 {
-    public class EndpointGroupMapper
+    public static class EndpointGroupMapper
     {
-        public static void MapEndpointGroups(WebApplication app)
+        public static void MapEndpointGroups(this WebApplication app)
         {
-            var rootRoutes = app.MapGroup("/api")
+            var root = app.MapGroup("/api")
                                 .RequireAuthorization()
                                 .AddEndpointFilter<EndpointFilters>()
                                 .ProducesValidationProblem();
 
 
-            var accounts = rootRoutes.MapGroup("/accounts")
-                                .MapCreateAccountEndpoint()
-                                .MapGetAccountByIdEndpoint();
+            var accounts = root.MapGroup("/accounts")
+                               .MapAccountsEndpoint();
 
             accounts.MapGroup("{accountId:guid}/transactions")
-                    .MapCreateTransactionEndpoints();
+                    .MapTransactionsEndpoints();
+            
+            accounts.MapGroup("{accountId:guid}/balances")
+                    .MapBalancesEndpoints();
         }
     }
 }

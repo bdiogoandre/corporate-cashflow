@@ -1,5 +1,6 @@
 using Corporate.Cashflow.Infraestructure.EntityFramework;
 using Corporate.CashFlow.Api;
+using Corporate.CashFlow.Api.Endpoints;
 using Corporate.CashFlow.Api.Endpoints.Transactions;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.MapCreateTransactionEndpoints();
+app.MapEndpointGroups();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

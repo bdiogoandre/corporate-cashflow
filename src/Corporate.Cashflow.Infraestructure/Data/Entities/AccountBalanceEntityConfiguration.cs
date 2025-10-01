@@ -12,6 +12,9 @@ namespace Corporate.Cashflow.Infraestructure.Data
                 .Property<uint>("xmin")
                 .IsRowVersion()
                 .IsConcurrencyToken();
+
+            builder.HasIndex(d => new { d.AccountId, d.Date })
+                .IsUnique();
         }
     }
 }

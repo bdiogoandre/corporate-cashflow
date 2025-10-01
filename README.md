@@ -118,6 +118,62 @@ graph TD;
     style Return fill:#e3f2fd
 ```
 
+## 🏗️ System Design
+
+```mermaid
+architecture-beta
+    group Internet
+        service User["Usuário"] icon:user
+
+    group Security
+        service FW["Firewall / WAF"] icon:shield
+        service APIGW["API Gateway"] icon:gateway
+
+    group Application
+        service IdentityAPI["Identity API (.NET 9)"] icon:api
+        service CashFlowAPI["CashFlow API (.NET 9)"] icon:api
+        service Consumer["Transaction Consumer"] icon:queue
+
+    group Messaging
+        service Kafka["Apache Kafka"] icon:message-queue
+
+    group Database
+        service EventStore["PostgreSQL - Event Store"] icon:database
+        service ConsolidatedDB["PostgreSQL - Saldos Consolidados"] icon:database
+
+    group Observability
+        service Aspire[".NET Aspire Dashboard"] icon:monitor
+        service Logs["Logs"] icon:logs
+        service Metrics["Métricas"] icon:metrics
+        service Traces["Traces Distribuídos"] icon:traces
+    end
+
+    %% Connections
+    User:R --> FW:L
+    FW:R --> APIGW:L
+
+    APIGW:B --> IdentityAPI:T
+    APIGW:B --> CashFlowAPI:T
+
+    CashFlowAPI:B --> EventStore:T
+    CashFlowAPI:R --> Kafka:L
+
+    Kafka:R --> Consumer:L
+    Consumer:B --> ConsolidatedDB:T
+
+    %% Observability connections
+    IdentityAPI:B --> Aspire:T
+    CashFlowAPI:B --> Aspire:T
+    Consumer:B --> Aspire:T
+    Kafka:B --> Aspire:T
+    EventStore:B --> Aspire:T
+    ConsolidatedDB:B --> Aspire:T
+
+    Aspire:B --> Logs:T
+    Aspire:B --> Metrics:T
+    Aspire:B --> Traces:T
+````
+
 ---
 
 ## 🎯 Casos de Uso

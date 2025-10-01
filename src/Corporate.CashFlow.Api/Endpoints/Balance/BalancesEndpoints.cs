@@ -77,10 +77,4 @@ namespace Corporate.CashFlow.Api.Endpoints.Balance
             return Results.Ok(response.Value);
         }
     }
-
-    public class GetAllBalancesPaginatedRequest : PaginationFilter
-    {
-        public DateOnly? InitialDate { get; set; }
-        public DateOnly? FinalDate { get; set; }
-    }
 }

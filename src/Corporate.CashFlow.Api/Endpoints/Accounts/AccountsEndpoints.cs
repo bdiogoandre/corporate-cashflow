@@ -73,10 +73,4 @@ namespace Corporate.CashFlow.Api.Endpoints.Accounts
             return Results.Ok(response.Value);
         }
     }
-
-    public class CreateAccountRequest
-    {
-        public string? Name { get; set; }
-        public ECurrency Currency { get; set; }
-    }
 }

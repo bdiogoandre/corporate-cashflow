@@ -126,21 +126,4 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
             return Results.Ok(response.Value);
         }
     }
-
-    public class CreateTransactionRequest
-    {
-        public decimal Amount { get; set; }
-        public string? Description { get; set; }
-        public DateTime Date { get; set; }
-        public ETransactionType TransactionType { get; set; }
-        public EPaymentMethod PaymentMethod { get; set; }
-    }
-
-    public class GetTransactionRequest : PaginationFilter
-    {
-        public DateTimeOffset? InitialDate { get; set; }
-        public DateTimeOffset? FinalDate { get; set; }
-        public ETransactionType? TransactionType { get; set; }
-        public EPaymentMethod? PaymentMethod { get; set; }
-    }
 }

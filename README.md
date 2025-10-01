@@ -121,57 +121,33 @@ graph TD;
 ## 🏗️ System Design
 
 ```mermaid
-architecture-beta
-    group internet(cloud)[Internet]
-        service user(user)[Usuário]
+flowchart TD
+    User([Usuário]) --> FW[Firewall / WAF] --> APIGW[API Gateway]
 
-    group security(cloud)[Segurança]
-        service fw(shield)[Firewall / WAF]
-        service apigw(gateway)[API Gateway]
+    APIGW -->|REST/JSON| IdentityAPI[Identity API]
+    APIGW -->|REST/JSON| CashFlowAPI[CashFlow API]
 
-    group app(cloud)[Aplicações]
-        service identityapi(api)[Identity API (.NET 9)]
-        service cashflowapi(api)[CashFlow API (.NET 9)]
-        service consumer(queue)[Transaction Consumer]
+    %% Event Sourcing Write Flow
+    CashFlowAPI -->|Grava Evento| EventStore[(PostgreSQL - Event Store)]
+    CashFlowAPI -->|Publica Evento| Kafka[(Kafka Broker)]
 
-    group messaging(cloud)[Mensageria]
-        service kafka(message-queue)[Apache Kafka]
-
-    group db(cloud)[Banco de Dados]
-        service eventstore(database)[PostgreSQL - Event Store]
-        service consolidateddb(database)[PostgreSQL - Saldos Consolidados]
-
-    group observability(cloud)[Observabilidade]
-        service aspire(monitor)[.NET Aspire Dashboard]
-        service logs(logs)[Logs]
-        service metrics(metrics)[Métricas]
-        service traces(traces)[Traces Distribuídos]
-
-    %% Conexões
-    user:R -- L:fw
-    fw:R -- L:apigw
-
-    apigw:B -- T:identityapi
-    apigw:B -- T:cashflowapi
-
-    cashflowapi:B -- T:eventstore
-    cashflowapi:R -- L:kafka
-
-    kafka:R -- L:consumer
-    consumer:B -- T:consolidateddb
+    %% Consumers
+    Kafka -->|Consome Evento| Consumer[Transaction Consumer]
+    Consumer -->|Atualiza| ConsolidatedDB[(PostgreSQL - Saldos Consolidados)]
 
     %% Observabilidade
-    identityapi:B -- T:aspire
-    cashflowapi:B -- T:aspire
-    consumer:B -- T:aspire
-    kafka:B -- T:aspire
-    eventstore:B -- T:aspire
-    consolidateddb:B -- T:aspire
+    subgraph Aspire[.NET Aspire Dashboard]
+        Logs[Logs Centralizados]
+        Metrics[Métricas]
+        Traces[Distributed Traces]
+    end
 
-    aspire:B -- T:logs
-    aspire:B -- T:metrics
-    aspire:B -- T:traces
-
+    IdentityAPI --> Aspire
+    CashFlowAPI --> Aspire
+    Consumer --> Aspire
+    Kafka --> Aspire
+    EventStore --> Aspire
+    ConsolidatedDB --> Aspire
 ````
 
 ---

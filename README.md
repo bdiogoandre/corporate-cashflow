@@ -37,7 +37,7 @@ Verifique se tudo está instalado:
 
 ```bash
 dotnet --version   # deve mostrar 9.x
-docker --version   # deve mostrar versão instalada
+docker
 ```
 
 ---

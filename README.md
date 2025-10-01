@@ -76,7 +76,7 @@ Abra no navegador:
 ## 🚀 Fluxo de Execução de Uma Transação
 
 ```mermaid
-flowchart TD
+graph TD;
     Start([Usuário cria transação]) --> Auth{Token válido?}
     Auth -->|Não| Reject[❌ 401 Unauthorized]
     Auth -->|Sim| Validate{Dados válidos?}

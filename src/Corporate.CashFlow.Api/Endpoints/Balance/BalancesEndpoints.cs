@@ -12,7 +12,7 @@ namespace Corporate.CashFlow.Api.Endpoints.Balance
         public static IEndpointRouteBuilder MapBalancesEndpoints(this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapGet("/date/{date}", GetBalancesDateAsync)
-                .WithTags("Balance")
+                .WithTags("Balances")
                 .WithName("GetBalancesDate")
                 .WithSummary("Get balances for a specific date")
                 .ProducesValidationProblem()
@@ -23,8 +23,8 @@ namespace Corporate.CashFlow.Api.Endpoints.Balance
                 .Produces(StatusCodes.Status404NotFound);
 
             endpoints.MapGet("/", GetAllBalancesPaginatedAsync)
-                .WithName("Balances")
                 .WithTags("Balances")
+                .WithName("GetAllBalances")
                 .WithSummary("Get All Balances from account with filter")
                 .ProducesValidationProblem()
                 .Produces<PagedResult<GetAllTransactionsPaginatedResponse>>()
@@ -37,9 +37,9 @@ namespace Corporate.CashFlow.Api.Endpoints.Balance
             return endpoints;
         }
 
-        private static async Task<IActionResult> GetAllBalancesPaginatedAsync(
+        private static async Task<IResult> GetAllBalancesPaginatedAsync(
             [FromRoute] Guid accountId,
-            [FromQuery] GetAllBalancesPaginatedRequest request,
+            [AsParameters] GetAllBalancesPaginatedRequest request,
             IMediator _mediator,
             CancellationToken cancellationToken)
         {
@@ -53,10 +53,15 @@ namespace Corporate.CashFlow.Api.Endpoints.Balance
             };
 
             var response = await _mediator.Send(query, cancellationToken);
-            return response.ToActionResult();
+            if (response.IsError)
+            {
+                return response.Errors.ToProblem();
+            }
+
+            return Results.Ok(response.Value);
         }
 
-        private static async Task<IActionResult> GetBalancesDateAsync(
+        private static async Task<IResult> GetBalancesDateAsync(
             [FromRoute] DateOnly date,
             [FromRoute] Guid accountId,
             IMediator _mediator,
@@ -64,7 +69,12 @@ namespace Corporate.CashFlow.Api.Endpoints.Balance
         {
             var query = new GetBalanceByDateQuery(accountId, date);
             var response = await _mediator.Send(query, cancellationToken);
-            return response.ToActionResult();
+            if (response.IsError)
+            {
+                return response.Errors.ToProblem();
+            }
+
+            return Results.Ok(response.Value);
         }
     }
 

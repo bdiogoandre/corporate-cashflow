@@ -1,9 +1,10 @@
 ﻿using Corporate.Cashflow.Application.Common;
+using ErrorOr;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Balances.GetByDate
 {
-    public record GetBalanceByDateQuery(Guid AccountId, DateOnly Date) : IRequest<Result<GetBalanceByDateResponse>>;
+    public record GetBalanceByDateQuery(Guid AccountId, DateOnly Date) : IRequest<ErrorOr<GetBalanceByDateResponse>>;
 
     public class GetBalanceByDateResponse
     {

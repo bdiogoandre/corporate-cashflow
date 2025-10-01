@@ -1,16 +1,11 @@
-﻿using Corporate.Cashflow.Application.Common;
-using Corporate.Cashflow.Application.Interfaces;
+﻿using Corporate.Cashflow.Application.Interfaces;
+using ErrorOr;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Corporate.Cashflow.Application.UseCases.Balances.GetByDate
 {
-    public class Handler : IRequestHandler<GetBalanceByDateQuery, Result<GetBalanceByDateResponse>>
+    public class Handler : IRequestHandler<GetBalanceByDateQuery, ErrorOr<GetBalanceByDateResponse>>
     {
         private readonly ICashflowDbContext _context;
 
@@ -19,14 +14,14 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.GetByDate
             _context = context;
         }
 
-        public async Task<Result<GetBalanceByDateResponse>> Handle(GetBalanceByDateQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<GetBalanceByDateResponse>> Handle(GetBalanceByDateQuery request, CancellationToken cancellationToken)
         {
             var result = await _context.AccountBalances
                 .Where(x => x.AccountId == request.AccountId && x.Date == request.Date)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (result == null)
-                return Result<GetBalanceByDateResponse>.Failure("Balance not found for the given date.");
+                return Error.NotFound("Balance not found for the given date.");
 
             var response = new GetBalanceByDateResponse
             {
@@ -37,7 +32,7 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.GetByDate
                 Balance = result.Balance
             };
 
-            return Result<GetBalanceByDateResponse>.Success(response);
+            return response;
         }
     }
 }

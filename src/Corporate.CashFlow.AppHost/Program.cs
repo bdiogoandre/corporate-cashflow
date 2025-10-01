@@ -4,8 +4,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var username = builder.AddParameter("username", value: "admin", secret: true);
 var password = builder.AddParameter("password", value: "123456", secret: true);
 
-var postgres = builder.AddPostgres("cashflow", userName: username, password: password, port: 5432)
-    .WithDataVolume("postgres-cashflow");
+var postgres = builder.AddPostgres("cashflow", userName: username, password: password, port: 5432);
 
 var cashFlowSql = postgres.AddDatabase("CashFlowSql", databaseName: "cash-flow");
 var identityServerSql = postgres.AddDatabase("IdentityServerSql", databaseName: "identity-server");

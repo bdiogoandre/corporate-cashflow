@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Corporate.Cashflow.Domain.Accounts
 {
     public class AccountBalance : BaseEntity
     {
         public Guid AccountId { get; set; }
+
         public Account? Account { get; set; }
         public DateOnly Date { get; set; }
         public decimal Inflows { get; set; }

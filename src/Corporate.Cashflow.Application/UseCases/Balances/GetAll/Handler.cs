@@ -1,10 +1,12 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Application.Interfaces;
+using ErrorOr;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Corporate.Cashflow.Application.UseCases.Balances.GetAll
 {
-    public class Handler : IRequestHandler<GetAllBalancesPaginatedQuery, Result<PagedResult<GetAllBalancesPaginatedResponse>>>
+    public class Handler : IRequestHandler<GetAllBalancesPaginatedQuery, ErrorOr<PagedResult<GetAllBalancesPaginatedResponse>>>
     {
         private readonly ICashflowDbContext _context;
 
@@ -13,7 +15,7 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.GetAll
             _context = context;
         }
 
-        public Task<Result<PagedResult<GetAllBalancesPaginatedResponse>>> Handle(GetAllBalancesPaginatedQuery query, CancellationToken cancellationToken)
+        public async Task<ErrorOr<PagedResult<GetAllBalancesPaginatedResponse>>> Handle(GetAllBalancesPaginatedQuery query, CancellationToken cancellationToken)
         {
             var queryable = _context.AccountBalances.Where(x => x.AccountId == query.AccountId);
 
@@ -26,12 +28,13 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.GetAll
 
             var total = queryable.Count();
 
-            queryable = queryable
+            var result = await queryable
                 .OrderByDescending(x => x.Date)
                 .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize);
+                .Take(query.PageSize)
+                .ToListAsync();
 
-            var balances = queryable.Select(x => new GetAllBalancesPaginatedResponse 
+            var balances = result.Select(x => new GetAllBalancesPaginatedResponse 
             { 
                 AccountId = x.AccountId, 
                 Balance = x.Balance, 
@@ -40,7 +43,7 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.GetAll
                 Outflows = x.Outflows
             }).ToList();
 
-            var result = new PagedResult<GetAllBalancesPaginatedResponse>
+            return new PagedResult<GetAllBalancesPaginatedResponse>
             {
                 Items = balances,
                 Page = query.Page,
@@ -48,7 +51,6 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.GetAll
                 TotalItems = total
             };
 
-            return Task.FromResult(Result<PagedResult<GetAllBalancesPaginatedResponse>>.Success(result));
         }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Corporate.Cashflow.Application.Common;
+using ErrorOr;
 using FluentValidation;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.Middlewares
 {
 
-    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse>>
-        where TRequest : IRequest<Result<TResponse>>
+    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, ErrorOr<TResponse>>
+        where TRequest : IRequest<ErrorOr<TResponse>>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -15,9 +16,9 @@ namespace Corporate.Cashflow.Application.Middlewares
             _validators = validators;
         }
 
-        public async Task<Result<TResponse>> Handle(
+        public async Task<ErrorOr<TResponse>> Handle(
             TRequest request,
-            RequestHandlerDelegate<Result<TResponse>> next,
+            RequestHandlerDelegate<ErrorOr<TResponse>> next,
             CancellationToken cancellationToken)
         {
             if (_validators.Any())
@@ -27,14 +28,13 @@ namespace Corporate.Cashflow.Application.Middlewares
                     .Select(v => v.Validate(context))
                     .SelectMany(r => r.Errors)
                     .Where(f => f != null)
-                    .Select(f => f.ErrorMessage)
-                    .ToList();
+                    .Select(f => f.ErrorMessage);
 
                 if (failures.Any())
-                    return Result<TResponse>.Failure(failures);
+                    return Error.Validation(string.Join(';', failures));
             }
 
-            return await next();
+            return await next(cancellationToken);
         }
     }
 }

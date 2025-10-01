@@ -22,7 +22,40 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Corporate.Cashflow.Domain.Account.AccountBalance", b =>
+            modelBuilder.Entity("Corporate.Cashflow.Domain.Accounts.Account", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Currency")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Accounts", (string)null);
+                });
+
+            modelBuilder.Entity("Corporate.Cashflow.Domain.Accounts.AccountBalance", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,6 +99,9 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccountId", "Date")
+                        .IsUnique();
+
                     b.ToTable("AccountBalances", (string)null);
                 });
 
@@ -94,6 +130,9 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TransactionType")
                         .HasColumnType("integer");
 
@@ -105,7 +144,31 @@ namespace Corporate.Cashflow.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccountId");
+
                     b.ToTable("Transactions", (string)null);
+                });
+
+            modelBuilder.Entity("Corporate.Cashflow.Domain.Accounts.AccountBalance", b =>
+                {
+                    b.HasOne("Corporate.Cashflow.Domain.Accounts.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Corporate.Cashflow.Domain.Transactions.Transaction", b =>
+                {
+                    b.HasOne("Corporate.Cashflow.Domain.Accounts.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }

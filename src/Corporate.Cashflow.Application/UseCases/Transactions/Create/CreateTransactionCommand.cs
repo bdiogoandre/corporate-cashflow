@@ -1,10 +1,11 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Domain.Enums;
+using ErrorOr;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
 {
-    public class CreateTransactionCommand : IRequest<Result<Guid>>
+    public class CreateTransactionCommand : IRequest<ErrorOr<Guid>>
     {
         public decimal Amount { get; set; }
         public string? Description { get; set; }

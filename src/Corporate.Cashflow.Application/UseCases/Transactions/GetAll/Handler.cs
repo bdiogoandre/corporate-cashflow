@@ -1,10 +1,12 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Application.Interfaces;
+using ErrorOr;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Corporate.Cashflow.Application.UseCases.Transactions.GetAll
 {
-    public class Handler : IRequestHandler<GetAllTransactionsPaginatedQuery, Result<PagedResult<GetAllTransactionsPaginatedResponse>>>
+    public class Handler : IRequestHandler<GetAllTransactionsPaginatedQuery, ErrorOr<PagedResult<GetAllTransactionsPaginatedResponse>>>
     {
         private readonly ICashflowDbContext _context;
 
@@ -13,7 +15,7 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.GetAll
             _context = context;
         }
 
-        public Task<Result<PagedResult<GetAllTransactionsPaginatedResponse>>> Handle(GetAllTransactionsPaginatedQuery query, CancellationToken cancellationToken)
+        public async Task<ErrorOr<PagedResult<GetAllTransactionsPaginatedResponse>>> Handle(GetAllTransactionsPaginatedQuery query, CancellationToken cancellationToken)
         {
             var queryable = _context.Transactions.AsQueryable();
 
@@ -32,9 +34,10 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.GetAll
 
             var total = queryable.Count();
 
-            queryable = queryable
+            var result = await queryable
                 .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize);
+                .Take(query.PageSize)
+                .ToListAsync();
 
             var transactions = queryable.Select(x => new GetAllTransactionsPaginatedResponse 
             { 
@@ -47,15 +50,13 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.GetAll
                 TransactionType = x.TransactionType 
             }).ToList();
 
-            var result = new PagedResult<GetAllTransactionsPaginatedResponse>
+            return new PagedResult<GetAllTransactionsPaginatedResponse>
             {
                 Items = transactions,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalItems = total
             };
-
-            return Task.FromResult(Result<PagedResult<GetAllTransactionsPaginatedResponse>>.Success(result));
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Application.Interfaces;
+using ErrorOr;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Accounts.GetById
 {
-    public class Handler : IRequestHandler<GetAccountByIdQuery, Result<GetAccountByIdResponse>>
+    public class Handler : IRequestHandler<GetAccountByIdQuery, ErrorOr<GetAccountByIdResponse>>
     {
         private readonly ICashflowDbContext _context;
 
@@ -13,11 +14,11 @@ namespace Corporate.Cashflow.Application.UseCases.Accounts.GetById
             _context = context;
         }
 
-        public async Task<Result<GetAccountByIdResponse>> Handle(GetAccountByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<GetAccountByIdResponse>> Handle(GetAccountByIdQuery request, CancellationToken cancellationToken)
         {
             var account = await _context.Accounts.FindAsync(request.Id, cancellationToken);
             if (account == null)
-                return Result<GetAccountByIdResponse>.Failure("Account not found");
+                return Error.NotFound("Account not found");
 
             var response = new GetAccountByIdResponse 
             { 
@@ -27,7 +28,7 @@ namespace Corporate.Cashflow.Application.UseCases.Accounts.GetById
                 UserId = account.UserId
             };
 
-            return Result<GetAccountByIdResponse>.Success(response);
+            return response;
         }
     }
 }

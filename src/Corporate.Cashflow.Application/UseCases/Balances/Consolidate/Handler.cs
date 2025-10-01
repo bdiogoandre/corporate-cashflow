@@ -4,7 +4,7 @@ using Corporate.Cashflow.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidation
+namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidate
 {
     public class Handler : IRequestHandler<ConsolidationCommand>
     {
@@ -28,24 +28,25 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidation
                     Date = DateOnly.FromDateTime(request.Date.Date),
                     Inflows = 0,
                     Outflows = 0,
-                    Balance = 0
+                    Balance = 0,
+                    LastTransactionId = request.TransactionId
                 };
+
                 _context.AccountBalances.Add(balance);
             }
-
-            if (balance.LastTransactionId == request.TransactionId)
+            else
             {
-                // Already processed this transaction
-                return;
+                if (balance.LastTransactionId == request.TransactionId) return;
             }
+
+
+            balance.LastTransactionId = request.TransactionId;
 
             if (request.TransactionType == ETransactionType.Inflow)
                 balance.CalculateInflow(request.Amount);
             else
                 balance.CalculateOutflow(request.Amount);
-            
 
-            // Verificar a inclusão do offset aqui
 
             await _context.SaveChangesAsync(cancellationToken);
 

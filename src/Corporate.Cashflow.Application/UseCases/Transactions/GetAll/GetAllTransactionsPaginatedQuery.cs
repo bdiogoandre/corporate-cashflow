@@ -1,10 +1,11 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Domain.Enums;
+using ErrorOr;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Transactions.GetAll
 {
-    public class GetAllTransactionsPaginatedQuery : PaginationFilter, IRequest<Result<PagedResult<GetAllTransactionsPaginatedResponse>>>
+    public class GetAllTransactionsPaginatedQuery : PaginationFilter, IRequest<ErrorOr<PagedResult<GetAllTransactionsPaginatedResponse>>>
     {
         public Guid AccountId { get; set; }
         public DateTimeOffset? InitialDate { get; set; }

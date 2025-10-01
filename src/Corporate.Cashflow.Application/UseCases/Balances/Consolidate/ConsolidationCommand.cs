@@ -1,7 +1,7 @@
 ﻿using Corporate.Cashflow.Domain.Enums;
 using MediatR;
 
-namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidation
+namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidate
 {
     public class ConsolidationCommand : IRequest
     {

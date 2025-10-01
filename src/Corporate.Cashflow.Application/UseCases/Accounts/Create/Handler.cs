@@ -1,11 +1,12 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Application.Interfaces;
 using Corporate.Cashflow.Domain.Accounts;
+using ErrorOr;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Accounts.Create
 {
-    public class Handler : IRequestHandler<CreateAccountCommand, Result<Guid>>
+    public class Handler : IRequestHandler<CreateAccountCommand, ErrorOr<Guid>>
     {
         private readonly ICashflowDbContext _context;
         private readonly IGetIdentifier _getIdentifier;
@@ -16,7 +17,7 @@ namespace Corporate.Cashflow.Application.UseCases.Accounts.Create
             _getIdentifier = getIdentifier;
         }
 
-        public async Task<Result<Guid>> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<Guid>> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
             var account = new Account
             {
@@ -29,7 +30,7 @@ namespace Corporate.Cashflow.Application.UseCases.Accounts.Create
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return Result<Guid>.Success(account.Id);
+            return account.Id;
         }
     }
 }

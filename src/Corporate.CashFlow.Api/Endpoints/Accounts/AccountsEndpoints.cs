@@ -1,9 +1,9 @@
 ﻿using Corporate.Cashflow.Application.UseCases.Accounts.Create;
 using Corporate.Cashflow.Application.UseCases.Accounts.GetById;
 using Corporate.Cashflow.Domain.Enums;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Corporate.CashFlow.Api.Endpoints.Accounts
 {
@@ -27,7 +27,7 @@ namespace Corporate.CashFlow.Api.Endpoints.Accounts
                 .WithName("GetAccountById")
                 .WithSummary("Get an store by ID.")
                 .WithDescription("Retrieves an store by its ID for the authenticated user.")
-                .Produces<GetAccountByIdResponse>(StatusCodes.Status200OK)
+                .Produces<ErrorOr<GetAccountByIdResponse>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized)
                 .Produces(StatusCodes.Status403Forbidden)
                 .Produces(StatusCodes.Status404NotFound)
@@ -36,9 +36,8 @@ namespace Corporate.CashFlow.Api.Endpoints.Accounts
             return group;
         }
 
-        private static async Task<IActionResult> CreateAsync(
+        private static async Task<IResult> CreateAsync(
             [FromBody] CreateAccountRequest request,
-            ClaimsPrincipal claims,
             IMediator _mediator,
             CancellationToken cancellationToken)
         {
@@ -51,19 +50,27 @@ namespace Corporate.CashFlow.Api.Endpoints.Accounts
 
             var response = await _mediator.Send(command, cancellationToken);
 
-            return response.ToActionResult();
+            if (response.IsError)
+            {
+                return response.Errors.ToProblem();
+            }
+
+            return Results.CreatedAtRoute("CreateAccount", new { id = response.Value }, response.Value);
         }
 
-        private static async Task<IActionResult> GetByIdAsync(
+        private static async Task<IResult> GetByIdAsync(
             [FromRoute] Guid id,
-            ClaimsPrincipal claims,
             IMediator _mediator,
             CancellationToken cancellationToken)
         {
 
             var response = await _mediator.Send(new GetAccountByIdQuery(id), cancellationToken);
+            if (response.IsError)
+            {
+                return response.Errors.ToProblem();
+            }
 
-            return response.ToActionResult();
+            return Results.Ok(response.Value);
         }
     }
 

@@ -3,9 +3,6 @@
 📊 **Sistema de Gestão de Fluxo de Caixa Corporativo**  
 Permite que empresas controlem suas finanças (entradas e saídas de dinheiro) de forma **distribuída, escalável e auditável**.
 
----
-
-## 🎯 O Que É Este Projeto?
 Um sistema moderno para controle financeiro que registra **todas as transações** como eventos (Event Sourcing), garante **auditoria completa** e suporta **alta carga** com processamento assíncrono via Kafka.
 
 ---
@@ -13,8 +10,8 @@ Um sistema moderno para controle financeiro que registra **todas as transações
 ## 🛠️ Tecnologias Utilizadas
 
 - **.NET 9** – Framework moderno, performático e multiplataforma  
-- **Clean Architecture** – Separação clara de responsabilidades  
-- **Event Sourcing** – Histórico completo de transações  
+- **Clean Architecture** – Separação clara de responsabilidades
+- **Event Sourcing** – Histórico completo de transações
 - **CQRS** – Separação entre escrita (commands) e leitura (queries)  
 - **Apache Kafka** – Mensageria confiável com **Partition Key** para garantir ordenação  
 - **Idempotent Producer** – Evita duplicações no Kafka  
@@ -58,7 +55,7 @@ O Aspire cuida da orquestração automaticamente, mas garanta que o Docker estej
 
 ### 3. Execute com Aspire
 ```bash
-dotnet run --project CorporateCashFlow.AppHost
+dotnet run --project .\src\Corporate.CashFlow.AppHost\Corporate.CashFlow.AppHost.csproj
 ```
 
 Isso irá:  
@@ -69,7 +66,7 @@ Isso irá:
 
 ### 4. Acesse o Dashboard
 Abra no navegador:  
-👉 [http://localhost:15000](http://localhost:15000)
+👉 [https://localhost:17229/](https://localhost:17229)
 
 ---
 
@@ -119,12 +116,12 @@ graph TD;
     Commit --> Done([✅ Concluído])
     Skip --> Commit
 
-    style Start fill:#e8f5e9
-    style Done fill:#e8f5e9
-    style Reject fill:#ffebee
-    style Error fill:#ffebee
-    style Conflict fill:#fff3e0
-    style Return fill:#e3f2fd
+    style Start fill:#e8f5e9,color:#000
+    style Done fill:#e8f5e9,color:#000
+    style Reject fill:#ffebee,color:#000
+    style Error fill:#ffebee,color:#000
+    style Conflict fill:#fff3e0,color:#000
+    style Return fill:#e3f2fd,color:#000
 ```
 
 ## 🏗️ System Design
@@ -175,6 +172,13 @@ flowchart TD
     ConsolidatedDB --> Aspire
 ````
 
+## ✅ Próximas Melhorias
+
+- Aumentar cobertura de testes de integração
+- Adicionar Testes Unitários 
+- Melhorar documentação do Swagger
+- Utilizar estratégia de Cache Aside para recuperar dados da conta do usuário
+
 ---
 
 ## 🎯 Casos de Uso
@@ -204,7 +208,7 @@ O **.NET Aspire** fornece:
 - Traces distribuídos  
 - Métricas (CPU, memória, requests/segundo)  
 - Health checks dos serviços  
-- Dashboard acessível em `http://localhost:15000`  
+- Dashboard acessível em `https://localhost:17229/`  
 
 ---
 
@@ -231,4 +235,6 @@ O **Corporate CashFlow** é um sistema que:
 - **Garante consistência e auditabilidade**  
 - **Escala horizontalmente** com Kafka  
 - **Mantém segurança** com JWT
+
+---
 

@@ -25,8 +25,8 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
                 .Produces(StatusCodes.Status500InternalServerError);
 
             /// Get transaction by id
-            endpoints.MapGet("/{transactionId}", GetAsync)
-                .WithName("CreateTransaction")
+            endpoints.MapGet("/{transactionId:guid}", GetAsync)
+                .WithName("GetTransaction")
                 .WithTags("Transactions")
                 .WithSummary("Create Transaction by account id")
                 .ProducesValidationProblem()
@@ -40,7 +40,7 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
 
             /// Get all transactions by account id with pagination and filters
             endpoints.MapGet("/", GetAllAsync)
-                .WithName("CreateTransaction")
+                .WithName("GetAllTransactions")
                 .WithTags("Transactions")
                 .WithSummary("Create Transaction by account id")
                 .ProducesValidationProblem()
@@ -54,9 +54,9 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
             return endpoints;
         }
 
-        public static async Task<IActionResult> CreateAsync(
-            Guid accountId,
-            CreateTransactionRequest request,
+        public static async Task<IResult> CreateAsync(
+            [FromRoute] Guid accountId,
+            [FromBody] CreateTransactionRequest request,
             IMediator _mediator,
             CancellationToken cancellationToken)
         {
@@ -68,17 +68,18 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
                 Description = request.Description,
                 TransactionType = request.TransactionType
             };
-            var result = await _mediator.Send(command, cancellationToken);
+            var response = await _mediator.Send(command, cancellationToken);
 
-            if (!result.IsSuccess)
+            if (response.IsError)
             {
-                return result.ToActionResult();
+                return response.Errors.ToProblem();
             }
 
-            return result.ToActionResult();
+            return Results.CreatedAtRoute("CreateTransaction", new { id = response.Value }, response.Value);
         }
 
-        public static async Task<IActionResult> GetAsync(
+        public static async Task<IResult> GetAsync(
+            [FromRoute] Guid accountId,
             [FromRoute] Guid transactionId,
             IMediator _mediator,
             CancellationToken cancellationToken)
@@ -88,14 +89,19 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
                 Id = transactionId
             };
             
-            var result = await _mediator.Send(query, cancellationToken);
+            var response = await _mediator.Send(query, cancellationToken);
 
-            return result.ToActionResult();
+            if (response.IsError)
+            {
+                return response.Errors.ToProblem();
+            }
+
+            return Results.Ok(response.Value);
         }
 
-        public static async Task<IActionResult> GetAllAsync(
+        public static async Task<IResult> GetAllAsync(
             [FromRoute] Guid accountId,
-            [FromQuery] GetTransactionRequest request,
+            [AsParameters] GetTransactionRequest request,
             IMediator _mediator,
             CancellationToken cancellationToken)
         {
@@ -110,9 +116,14 @@ namespace Corporate.CashFlow.Api.Endpoints.Transactions
                 PageSize = request.PageSize
             };
 
-            var result = await _mediator.Send(query, cancellationToken);
+            var response = await _mediator.Send(query, cancellationToken);
 
-            return result.ToActionResult();
+            if (response.IsError)
+            {
+                return response.Errors.ToProblem();
+            }
+
+            return Results.Ok(response.Value);
         }
     }
 

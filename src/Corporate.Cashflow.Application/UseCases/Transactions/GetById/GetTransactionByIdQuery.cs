@@ -1,10 +1,11 @@
 ﻿using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Domain.Enums;
+using ErrorOr;
 using MediatR;
 
 namespace Corporate.Cashflow.Application.UseCases.Transactions.GetById
 {
-    public class GetTransactionByIdQuery : IRequest<Result<GetTransactionByIdResponse>>
+    public class GetTransactionByIdQuery : IRequest<ErrorOr<GetTransactionByIdResponse>>
     {
         public Guid Id { get; set; }
     }

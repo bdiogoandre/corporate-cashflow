@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Corporate.Cashflow.Domain\Corporate.Cashflow.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

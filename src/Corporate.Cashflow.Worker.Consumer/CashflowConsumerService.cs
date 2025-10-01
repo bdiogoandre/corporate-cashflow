@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using Corporate.Cashflow.Application.UseCases.Balances.Consolidation;
+using Corporate.Cashflow.Application.UseCases.Balances.Consolidate;
 using Corporate.Cashflow.Domain.Transactions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

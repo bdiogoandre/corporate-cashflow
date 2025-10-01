@@ -1,14 +1,15 @@
 ﻿using Confluent.Kafka;
-using Corporate.Cashflow.Application.Common;
 using Corporate.Cashflow.Application.Interfaces;
 using Corporate.Cashflow.Domain.Transactions;
+using ErrorOr;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
 {
-    public class Handler : IRequestHandler<CreateTransactionCommand, Result<Guid>>
+    public class Handler : IRequestHandler<CreateTransactionCommand, ErrorOr<Guid>>
     {
         private readonly IProducer<string, string> _producer;
         private readonly ICashflowDbContext _context;
@@ -21,10 +22,11 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
             _topic = configuration["Kafka:Topic"]!;
         }
 
-        public async Task<Result<Guid>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<Guid>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
         {
-            // Verificar Account
-
+            var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == request.AccountId, cancellationToken);
+            if(account == null)
+                return ErrorOr.Error.NotFound("Account not found");
 
             var transaction = new Transaction
             {
@@ -48,10 +50,10 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
             }, cancellationToken);
 
             if(result.Status != PersistenceStatus.Persisted)
-                return Result<Guid>.Failure("Failed to produce message to Kafka");
+                return ErrorOr.Error.Failure("Failed to produce message to Kafka");
             
 
-            return Result<Guid>.Success(transaction.Id);
+            return transaction.Id;
         }
     }
 }

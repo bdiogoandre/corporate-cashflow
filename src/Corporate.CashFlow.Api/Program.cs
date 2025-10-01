@@ -1,7 +1,6 @@
 using Corporate.Cashflow.Infraestructure.EntityFramework;
 using Corporate.CashFlow.Api;
 using Corporate.CashFlow.Api.Endpoints;
-using Corporate.CashFlow.Api.Endpoints.Transactions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

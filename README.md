@@ -46,7 +46,7 @@ docker --version   # deve mostrar versão instalada
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/sua-org/corporate-cashflow.git
+git clone https://github.com/bdiogoandre/corporate-cashflow.git
 cd corporate-cashflow
 ```
 

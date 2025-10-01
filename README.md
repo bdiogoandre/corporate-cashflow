@@ -31,12 +31,13 @@ Antes de rodar o projeto, instale:
 
 - [✅ .NET 9 SDK](https://dotnet.microsoft.com/download)  
 - [✅ Docker](https://www.docker.com/) (para Kafka + PostgreSQL)  
-- [✅ .NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire)  
+- [✅ .NET Aspire workload](https://learn.microsoft.com/en-us/dotnet/aspire)  
 
 Verifique se tudo está instalado:
 
 ```bash
 dotnet --version   # deve mostrar 9.x
+dotnet workload install aspire
 docker
 ```
 

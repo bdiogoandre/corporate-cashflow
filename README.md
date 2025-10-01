@@ -13,7 +13,7 @@ Um sistema moderno para controle financeiro que registra **todas as transações
 - **Clean Architecture** – Separação clara de responsabilidades
 - **Event Sourcing** – Histórico completo de transações
 - **CQRS** – Separação entre escrita (commands) e leitura (queries)  
-- **Apache Kafka** – Mensageria confiável com **Partition Key** para garantir ordenação  
+- **Apache Kafka** – Mensageria confiável com **Partition Key** para garantir **ordenação**
 - **Idempotent Producer** – Evita duplicações no Kafka  
 - **Optimistic Locking (PostgreSQL xmin)** – Controle de concorrência no saldo diário  
 - **Entity Framework Core** – ORM para abstração de banco de dados  

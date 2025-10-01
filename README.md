@@ -122,56 +122,56 @@ graph TD;
 
 ```mermaid
 architecture-beta
-    group Internet
-        service User["Usuário"] icon:user
+    group internet(cloud)[Internet]
+        service user(user)[Usuário]
 
-    group Security
-        service FW["Firewall / WAF"] icon:shield
-        service APIGW["API Gateway"] icon:gateway
+    group security(cloud)[Segurança]
+        service fw(shield)[Firewall / WAF]
+        service apigw(gateway)[API Gateway]
 
-    group Application
-        service IdentityAPI["Identity API (.NET 9)"] icon:api
-        service CashFlowAPI["CashFlow API (.NET 9)"] icon:api
-        service Consumer["Transaction Consumer"] icon:queue
+    group app(cloud)[Aplicações]
+        service identityapi(api)[Identity API (.NET 9)]
+        service cashflowapi(api)[CashFlow API (.NET 9)]
+        service consumer(queue)[Transaction Consumer]
 
-    group Messaging
-        service Kafka["Apache Kafka"] icon:message-queue
+    group messaging(cloud)[Mensageria]
+        service kafka(message-queue)[Apache Kafka]
 
-    group Database
-        service EventStore["PostgreSQL - Event Store"] icon:database
-        service ConsolidatedDB["PostgreSQL - Saldos Consolidados"] icon:database
+    group db(cloud)[Banco de Dados]
+        service eventstore(database)[PostgreSQL - Event Store]
+        service consolidateddb(database)[PostgreSQL - Saldos Consolidados]
 
-    group Observability
-        service Aspire[".NET Aspire Dashboard"] icon:monitor
-        service Logs["Logs"] icon:logs
-        service Metrics["Métricas"] icon:metrics
-        service Traces["Traces Distribuídos"] icon:traces
-    end
+    group observability(cloud)[Observabilidade]
+        service aspire(monitor)[.NET Aspire Dashboard]
+        service logs(logs)[Logs]
+        service metrics(metrics)[Métricas]
+        service traces(traces)[Traces Distribuídos]
 
-    %% Connections
-    User:R --> FW:L
-    FW:R --> APIGW:L
+    %% Conexões
+    user:R -- L:fw
+    fw:R -- L:apigw
 
-    APIGW:B --> IdentityAPI:T
-    APIGW:B --> CashFlowAPI:T
+    apigw:B -- T:identityapi
+    apigw:B -- T:cashflowapi
 
-    CashFlowAPI:B --> EventStore:T
-    CashFlowAPI:R --> Kafka:L
+    cashflowapi:B -- T:eventstore
+    cashflowapi:R -- L:kafka
 
-    Kafka:R --> Consumer:L
-    Consumer:B --> ConsolidatedDB:T
+    kafka:R -- L:consumer
+    consumer:B -- T:consolidateddb
 
-    %% Observability connections
-    IdentityAPI:B --> Aspire:T
-    CashFlowAPI:B --> Aspire:T
-    Consumer:B --> Aspire:T
-    Kafka:B --> Aspire:T
-    EventStore:B --> Aspire:T
-    ConsolidatedDB:B --> Aspire:T
+    %% Observabilidade
+    identityapi:B -- T:aspire
+    cashflowapi:B -- T:aspire
+    consumer:B -- T:aspire
+    kafka:B -- T:aspire
+    eventstore:B -- T:aspire
+    consolidateddb:B -- T:aspire
 
-    Aspire:B --> Logs:T
-    Aspire:B --> Metrics:T
-    Aspire:B --> Traces:T
+    aspire:B -- T:logs
+    aspire:B -- T:metrics
+    aspire:B -- T:traces
+
 ````
 
 ---

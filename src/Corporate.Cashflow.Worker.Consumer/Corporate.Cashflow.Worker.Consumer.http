@@ -1,0 +1,6 @@
+@Corporate.Cashflow.Worker.Consumer_HostAddress = http://localhost:5103
+
+GET {{Corporate.Cashflow.Worker.Consumer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

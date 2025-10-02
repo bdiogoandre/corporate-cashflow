@@ -170,9 +170,9 @@ flowchart TD
     ConsolidatedDB[PostgreSQL - Saldos Consolidados]
 
     Aspire[Grafana]
-    Logs[Logs]
-    Metrics[Métricas]
-    Traces[Traces]
+    Logs[Logs - Loki]
+    Metrics[Métricas - Prometheus]
+    Traces[Traces - Jaeger]
 
     %% Links (cada conexão em sua própria linha)
     User --> FW

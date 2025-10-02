@@ -270,6 +270,8 @@ O **Corporate CashFlow** é um sistema que:
 ---
 
 ## Coleta de Métricas
+
+```mermaid
 flowchart TD
     subgraph User["Usuário / Grafana"]
         GQuery["Consulta (PromQL)"]

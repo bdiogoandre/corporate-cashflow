@@ -169,10 +169,10 @@ flowchart TD
     Consumer[Transaction Consumer]
     ConsolidatedDB[PostgreSQL - Saldos Consolidados]
 
-    Aspire[.NET Aspire Dashboard]
-    Logs[Logs Centralizados]
+    Aspire[Grafana]
+    Logs[Logs]
     Metrics[Métricas]
-    Traces[Traces Distribuídos]
+    Traces[Traces]
 
     %% Links (cada conexão em sua própria linha)
     User --> FW

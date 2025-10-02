@@ -7,15 +7,20 @@ Um sistema moderno para controle financeiro que registra **todas as transações
 
 ---
 
-## 🛠️ Funcionalidades Técnicas Utilizadas
+## 🛠️ Funcionalidades e Conceitos Técnicos Utilizadas
 
-- **.NET 9** – Framework moderno, performático e multiplataforma  
-- **Clean Architecture** – Separação clara de responsabilidades
-- **Event Sourcing** – Histórico completo de transações
-- **CQRS** – Separação entre escrita (commands) e leitura (queries)  
+- **.NET 9** – Framework
+- **Clean Architecture** – Design do Código
+- **Event Sourcing** – Auditoria
+- **CQRS** – Separação entre escrita (commands) e leitura (queries) (Implementada no código em um único Banco de Dados para simplificação)
+
+---
+  
 - **Apache Kafka** – Mensageria confiável com **Partition Key** para garantir **ordenação**
-- **Idempotent Producer** – Evita duplicações no Kafka  
-- **Optimistic Locking (PostgreSQL xmin)** – Controle de concorrência no saldo diário  
+- **Idempotent Producer** - Garante que as mensagens sejam entregas a todas as partições e **Exacly Once** com lógica de tratamento de duplicidade de consolidação no downstream mesmo que haja retry na entrega.
+- **Optimistic Locking (PostgreSQL xmin)** - Garante a resiliência na consolidação e realiza o retry com a versão correta do saldo.<br/><br/>
+Para que as transações sejam processadas em **ordem** e com **idempotência**, garantindo que as consolidações de saldo sejam confiáveis 
+---
 - **Entity Framework Core** – ORM para abstração de banco de dados  
 - **MediatR** – Organização da lógica com CQRS  
 - **FluentValidation** – Validação declarativa e testável  
@@ -76,12 +81,11 @@ Abra no navegador:
 * Items que não foram utilizados na solução estão marcados como <span style="color:#aa0000">**(Não utilizado)**</span>
 
 1. O usuário envia uma requisição para criar ou consultar transações.  
-2. O tráfego passa pelo **Firewall** e **API Gateway** para validação de segurança e roteamento. **(Não utilizado)**
-3. As APIs processam a requisição:  
+2. As APIs processam a requisição:  
    - **Escrita (Command)**: grava o evento no **Event Store** e publica no Kafka.  
    - **Leitura (Query)**: consulta saldo ou histórico diretamente no banco projetado.  
-4. O **Consumer** consome eventos do Kafka, calcula o saldo diário e grava no **Consolidated DB**.  
-5. Todas as operações são monitoradas e logadas pelo **.NET Aspire**, garantindo observabilidade completa.  
+3. O **Consumer** consome eventos do Kafka, calcula o saldo diário e grava no **Consolidated DB**.  
+4. Todas as operações são monitoradas e logadas pelo **.NET Aspire**, garantindo observabilidade completa.  
 
 
 ```mermaid
@@ -129,50 +133,81 @@ graph TD;
 
 ## 🏗️ System Design
 
+**Ambiente:** Cluster Kubernetes para orquestrar os containers e garantir a escalabilidade horizontal.
 Abaixo uma apresentação do System Design com elementos utilizados e outros que podem fazer parte em um ambiente de produção real. Items que não foram utilizados na solução estão marcados como <span style="color:#aa0000">**(Não utilizado)**</span>
 
 ### Componentes Principais
 
 - **Firewall / WAF**: protege contra ataques DDoS e tráfego malicioso <span style="color:#aa0000">**(Não utilizado)**</span>.
 - **API Gateway**: centraliza autenticação, autorização e controle de tráfego. <span style="color:#aa0000">**(Não utilizado)**</span>.
-- **Identity API**: gerencia autenticação e usuários.
+- **Load Balancer**: Para balancear a carga de requisições <span style="color:#aa0000">**(Não utilizado)**</span>.
+- **Identity API**
 - **CashFlow API**: recebe e grava transações, publica eventos no Kafka.  
-- **Kafka**: mensageria confiável para processamento assíncrono e garantia de ordem via **Partition Key**.  
 - **Transaction Consumer**: processa eventos do Kafka, consolida saldo diário no banco de dados.  
-- **Event Store**: banco de eventos (PostgreSQL) que registra todas as transações.  
-- **Consolidated DB**: banco de dados para projeção do saldo diário consolidado, com **Optimistic Locking** para controle de concorrência.  
+- **Event Store**
+- **Consolidated DB**
 - **.NET Aspire**: orquestra serviços distribuídos, coleta métricas, logs e traces distribuídos para observabilidade.  
-
-
 
 ```mermaid
 flowchart TD
-    User([Usuário]) --> FW[Firewall / WAF] --> APIGW[API Gateway]
+    %% Nodes (cada nó declarado em sua própria linha)
+    User[Usuário]
+    FW[Firewall / WAF]
+    APIGW[API Gateway]
 
-    APIGW -->|REST/JSON| IdentityAPI[Identity API]
-    APIGW -->|REST/JSON| CashFlowAPI[CashFlow API]
+    ALBIdentity[ALB - Identity API]
+    IdentityAPI[Identity API]
 
-    %% Event Sourcing Write Flow
-    CashFlowAPI -->|Grava Evento| EventStore[(PostgreSQL - Event Store)]
-    CashFlowAPI -->|Publica Evento| Kafka[(Kafka Broker)]
+    ALBCashFlow[ALB - CashFlow API]
+    CashFlowAPI[CashFlow API - Write]
 
-    %% Consumers
-    Kafka -->|Consome Evento| Consumer[Transaction Consumer]
-    Consumer -->|Atualiza| ConsolidatedDB[(PostgreSQL - Saldos Consolidados)]
+    ALBBalance[ALB - Balance API]
+    BalanceAPI[Balance API - Read]
 
-    %% Observabilidade
-    subgraph Aspire[.NET Aspire Dashboard]
-        Logs[Logs Centralizados]
-        Metrics[Métricas]
-        Traces[Distributed Traces]
-    end
+    EventStore[PostgreSQL - Event Store]
+    Kafka[Kafka Broker]
+    Consumer[Transaction Consumer]
+    ConsolidatedDB[PostgreSQL - Saldos Consolidados]
 
+    Aspire[Grafana]
+    Logs[Logs - Loki]
+    Metrics[Métricas - Prometheus]
+    Traces[Traces - Jaeger]
+
+    %% Links (cada conexão em sua própria linha)
+    User --> FW
+    FW --> APIGW
+
+    APIGW -->|REST/JSON| ALBIdentity
+    ALBIdentity --> IdentityAPI
+
+    APIGW -->|REST/JSON| ALBCashFlow
+    ALBCashFlow --> CashFlowAPI
+
+    APIGW -->|REST/JSON| ALBBalance
+    ALBBalance --> BalanceAPI
+
+    CashFlowAPI -->|Grava Evento| EventStore
+    CashFlowAPI -->|Publica Evento| Kafka
+
+    Kafka -->|Consome Evento| Consumer
+    Consumer -->|Atualiza| ConsolidatedDB
+
+    BalanceAPI -->|Consulta| ConsolidatedDB
+
+    %% Observability
     IdentityAPI --> Aspire
     CashFlowAPI --> Aspire
+    BalanceAPI --> Aspire
     Consumer --> Aspire
     Kafka --> Aspire
     EventStore --> Aspire
     ConsolidatedDB --> Aspire
+
+    Aspire --> Logs
+    Aspire --> Metrics
+    Aspire --> Traces
+
 ````
 
 ## ✅ Próximas Melhorias

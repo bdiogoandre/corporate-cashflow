@@ -36,6 +36,7 @@ namespace Corporate.Cashflow.Application.UseCases.Balances.Consolidate
             }
             else
             {
+                // Idempotency check
                 if (balance.LastTransactionId == request.TransactionId) return;
             }
 

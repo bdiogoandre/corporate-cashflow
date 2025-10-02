@@ -19,6 +19,7 @@ Um sistema moderno para controle financeiro que registra **todas as transações
 - **Apache Kafka** – Mensageria confiável com **Partition Key** para garantir **ordenação**
 - **Idempotent Producer** - Garante que as mensagens sejam entregas a todas as partições e **Exacly Once** com lógica de tratamento de duplicidade de consolidação no downstream mesmo que haja retry na entrega.
 - **Optimistic Locking (PostgreSQL xmin)** - Garante a resiliência na consolidação e realiza o retry com a versão correta do saldo.
+
 Para que as consolidações sejam feitas em **ordem** e com **idempotência**, garantindo que as consolidações de saldo sejam confiáveis 
 ---
 - **Entity Framework Core** – ORM para abstração de banco de dados  

@@ -148,32 +148,31 @@ Abaixo uma apresentação do System Design com elementos utilizados e outros que
 - **Consolidated DB**
 - **.NET Aspire**: orquestra serviços distribuídos, coleta métricas, logs e traces distribuídos para observabilidade.  
 
-
-
 ```mermaid
 flowchart TD
-    User([Usuário]) --> FW[Firewall / WAF] --> APIGW[API Gateway]
+    User([Usuário]) --> FW[Firewall / WAF]
+    FW --> APIGW[API Gateway]
 
     %% APIs com ALB dedicado
-    APIGW -->|REST/JSON| ALBIdentity[ALB - Identity API]
+    APIGW --> ALBIdentity[ALB - Identity API]
     ALBIdentity --> IdentityAPI[Identity API]
 
-    APIGW -->|REST/JSON| ALBCashFlow[ALB - CashFlow API]
+    APIGW --> ALBCashFlow[ALB - CashFlow API]
     ALBCashFlow --> CashFlowAPI[CashFlow API (Write)]
 
-    APIGW -->|REST/JSON| ALBBalance[ALB - Balance API]
+    APIGW --> ALBBalance[ALB - Balance API]
     ALBBalance --> BalanceAPI[Balance API (Read)]
 
     %% Event Sourcing Write Flow
-    CashFlowAPI -->|Grava Evento| EventStore[(PostgreSQL - Event Store)]
-    CashFlowAPI -->|Publica Evento| Kafka[(Kafka Broker)]
+    CashFlowAPI --> EventStore[(PostgreSQL - Event Store)]
+    CashFlowAPI --> Kafka[(Kafka Broker)]
 
     %% Consumers
-    Kafka -->|Consome Evento| Consumer[Transaction Consumer]
-    Consumer -->|Atualiza| ConsolidatedDB[(PostgreSQL - Saldos Consolidados)]
+    Kafka --> Consumer[Transaction Consumer]
+    Consumer --> ConsolidatedDB[(PostgreSQL - Saldos Consolidados)]
 
     %% Read Flow
-    BalanceAPI -->|Consulta| ConsolidatedDB
+    BalanceAPI --> ConsolidatedDB
 
     %% Observabilidade
     subgraph Aspire[.NET Aspire Dashboard]
@@ -189,6 +188,7 @@ flowchart TD
     Kafka --> Aspire
     EventStore --> Aspire
     ConsolidatedDB --> Aspire
+
 ````
 
 ## ✅ Próximas Melhorias

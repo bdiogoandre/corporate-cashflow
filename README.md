@@ -7,7 +7,7 @@ Um sistema moderno para controle financeiro que registra **todas as transações
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Funcionalidades Técnicas Utilizadas
 
 - **.NET 9** – Framework moderno, performático e multiplataforma  
 - **Clean Architecture** – Separação clara de responsabilidades
@@ -73,8 +73,10 @@ Abra no navegador:
 
 ## 🚀 Fluxo de Execução de Uma Transação
 
+* Items que não foram utilizados na solução estão marcados como <span style="color:#aa0000">**(Não utilizado)**</span>
+
 1. O usuário envia uma requisição para criar ou consultar transações.  
-2. O tráfego passa pelo **Firewall** e **API Gateway** para validação de segurança e roteamento.  
+2. O tráfego passa pelo **Firewall** e **API Gateway** para validação de segurança e roteamento. **(Não utilizado)**
 3. As APIs processam a requisição:  
    - **Escrita (Command)**: grava o evento no **Event Store** e publica no Kafka.  
    - **Leitura (Query)**: consulta saldo ou histórico diretamente no banco projetado.  

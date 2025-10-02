@@ -269,3 +269,45 @@ O **Corporate CashFlow** é um sistema que:
 
 ---
 
+## Coleta de Métricas
+```mermaid
+flowchart TD
+    subgraph User["Usuário / Grafana"]
+        GQuery["Consulta (PromQL)"]
+    end
+
+    subgraph Prometheus["Prometheus (TSDB)"]
+        TSDB["Banco de Séries Temporais"]
+    end
+
+    subgraph Kubernetes["Cluster Kubernetes"]
+        subgraph AppPods["Aplicações .NET (Pods)"]
+            A1["Pod 1 /metrics"]
+            A2["Pod 2 /metrics"]
+            A3["Pod N /metrics"]
+        end
+
+        subgraph Infra["Infraestrutura"]
+            KubeState["kube-state-metrics"]
+            Cadvisor["Kubelet / cAdvisor"]
+            NodeExp["Node Exporter"]
+        end
+    end
+
+    %% Scraping
+    Prometheus -->|Scraping HTTP GET| A1
+    Prometheus -->|Scraping HTTP GET| A2
+    Prometheus -->|Scraping HTTP GET| A3
+    Prometheus -->|Scraping HTTP GET| KubeState
+    Prometheus -->|Scraping HTTP GET| Cadvisor
+    Prometheus -->|Scraping HTTP GET| NodeExp
+
+    %% Storage
+    Prometheus --> TSDB
+
+    %% Query
+    GQuery --> Prometheus
+    GQuery --> TSDB
+
+```
+

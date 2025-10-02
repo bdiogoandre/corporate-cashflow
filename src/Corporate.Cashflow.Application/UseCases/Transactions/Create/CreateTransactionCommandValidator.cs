@@ -17,8 +17,8 @@ namespace Corporate.Cashflow.Application.UseCases.Transactions.Create
                 .WithMessage("Description cannot exceed 250 characters.");
 
             RuleFor(x => x.Date)
-                .LessThanOrEqualTo(DateTime.UtcNow)
-                .WithMessage("Date cannot be in the future.");
+                .NotEmpty()
+                .WithMessage("Invalid Transaction Date.");
 
             RuleFor(x => x.AccountId)
                 .NotEmpty()

@@ -12,7 +12,7 @@ Um sistema moderno para controle financeiro que registra **todas as transações
 - **.NET 9** – Framework
 - **Clean Architecture** – Design do Código
 - **Event Sourcing** – Auditoria
-- **CQRS** – Separação entre escrita (commands) e leitura (queries) (Aqui representada em um único Banco de Dados para simplificação)
+- **CQRS** – Separação entre escrita (commands) e leitura (queries) (Implementada no código em um único Banco de Dados para simplificação)
 
 ---
   

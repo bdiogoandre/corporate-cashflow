@@ -150,37 +150,52 @@ Abaixo uma apresentação do System Design com elementos utilizados e outros que
 
 ```mermaid
 flowchart TD
-    User([Usuário]) --> FW[Firewall / WAF]
-    FW --> APIGW[API Gateway]
+    %% Nodes (cada nó declarado em sua própria linha)
+    User[Usuário]
+    FW[Firewall / WAF]
+    APIGW[API Gateway]
 
-    %% APIs com ALB dedicado
-    APIGW --> ALBIdentity[ALB - Identity API]
-    ALBIdentity --> IdentityAPI[Identity API]
+    ALBIdentity[ALB - Identity API]
+    IdentityAPI[Identity API]
 
-    APIGW --> ALBCashFlow[ALB - CashFlow API]
-    ALBCashFlow --> CashFlowAPI[CashFlow API (Write)]
+    ALBCashFlow[ALB - CashFlow API]
+    CashFlowAPI[CashFlow API - Write]
 
-    APIGW --> ALBBalance[ALB - Balance API]
-    ALBBalance --> BalanceAPI[Balance API (Read)]
+    ALBBalance[ALB - Balance API]
+    BalanceAPI[Balance API - Read]
 
-    %% Event Sourcing Write Flow
-    CashFlowAPI --> EventStore[(PostgreSQL - Event Store)]
-    CashFlowAPI --> Kafka[(Kafka Broker)]
+    EventStore[PostgreSQL - Event Store]
+    Kafka[Kafka Broker]
+    Consumer[Transaction Consumer]
+    ConsolidatedDB[PostgreSQL - Saldos Consolidados]
 
-    %% Consumers
-    Kafka --> Consumer[Transaction Consumer]
-    Consumer --> ConsolidatedDB[(PostgreSQL - Saldos Consolidados)]
+    Aspire[.NET Aspire Dashboard]
+    Logs[Logs Centralizados]
+    Metrics[Métricas]
+    Traces[Traces Distribuídos]
 
-    %% Read Flow
-    BalanceAPI --> ConsolidatedDB
+    %% Links (cada conexão em sua própria linha)
+    User --> FW
+    FW --> APIGW
 
-    %% Observabilidade
-    subgraph Aspire[.NET Aspire Dashboard]
-        Logs[Logs Centralizados]
-        Metrics[Métricas]
-        Traces[Distributed Traces]
-    end
+    APIGW -->|REST/JSON| ALBIdentity
+    ALBIdentity --> IdentityAPI
 
+    APIGW -->|REST/JSON| ALBCashFlow
+    ALBCashFlow --> CashFlowAPI
+
+    APIGW -->|REST/JSON| ALBBalance
+    ALBBalance --> BalanceAPI
+
+    CashFlowAPI -->|Grava Evento| EventStore
+    CashFlowAPI -->|Publica Evento| Kafka
+
+    Kafka -->|Consome Evento| Consumer
+    Consumer -->|Atualiza| ConsolidatedDB
+
+    BalanceAPI -->|Consulta| ConsolidatedDB
+
+    %% Observability
     IdentityAPI --> Aspire
     CashFlowAPI --> Aspire
     BalanceAPI --> Aspire
@@ -188,6 +203,10 @@ flowchart TD
     Kafka --> Aspire
     EventStore --> Aspire
     ConsolidatedDB --> Aspire
+
+    Aspire --> Logs
+    Aspire --> Metrics
+    Aspire --> Traces
 
 ````
 

@@ -270,44 +270,82 @@ O **Corporate CashFlow** é um sistema que:
 ---
 
 ## Coleta de Métricas
-```mermaid
 flowchart TD
     subgraph User["Usuário / Grafana"]
         GQuery["Consulta (PromQL)"]
     end
 
-    subgraph Prometheus["Prometheus (TSDB)"]
-        TSDB["Banco de Séries Temporais"]
+    subgraph Global["Escala Global (HA / Multi-Cluster)"]
+        subgraph Thanos["Thanos / Cortex / Mimir"]
+            Querier["Thanos Querier (API PromQL)"]
+            StoreGW["Store Gateway"]
+            Compactor["Compactor"]
+            Bucket["Object Storage (S3, GCS, Azure Blob)"]
+        end
     end
 
-    subgraph Kubernetes["Cluster Kubernetes"]
-        subgraph AppPods["Aplicações .NET (Pods)"]
+    subgraph Cluster1["Kubernetes Cluster A"]
+        subgraph PromA["Prometheus A (HA)"]
+            TSA["TSDB (local)"]
+            SidecarA["Thanos Sidecar"]
+        end
+
+        subgraph AppsA["Aplicações .NET (Pods)"]
             A1["Pod 1 /metrics"]
             A2["Pod 2 /metrics"]
-            A3["Pod N /metrics"]
         end
 
-        subgraph Infra["Infraestrutura"]
-            KubeState["kube-state-metrics"]
-            Cadvisor["Kubelet / cAdvisor"]
-            NodeExp["Node Exporter"]
+        subgraph InfraA["Infraestrutura"]
+            KubeStateA["kube-state-metrics"]
+            CadvisorA["Kubelet / cAdvisor"]
+            NodeExpA["Node Exporter"]
         end
     end
 
-    %% Scraping
-    Prometheus -->|Scraping HTTP GET| A1
-    Prometheus -->|Scraping HTTP GET| A2
-    Prometheus -->|Scraping HTTP GET| A3
-    Prometheus -->|Scraping HTTP GET| KubeState
-    Prometheus -->|Scraping HTTP GET| Cadvisor
-    Prometheus -->|Scraping HTTP GET| NodeExp
+    subgraph Cluster2["Kubernetes Cluster B"]
+        subgraph PromB["Prometheus B (HA)"]
+            TSB["TSDB (local)"]
+            SidecarB["Thanos Sidecar"]
+        end
 
-    %% Storage
-    Prometheus --> TSDB
+        subgraph AppsB["Aplicações .NET (Pods)"]
+            B1["Pod 1 /metrics"]
+            B2["Pod 2 /metrics"]
+        end
 
-    %% Query
-    GQuery --> Prometheus
-    GQuery --> TSDB
+        subgraph InfraB["Infraestrutura"]
+            KubeStateB["kube-state-metrics"]
+            CadvisorB["Kubelet / cAdvisor"]
+            NodeExpB["Node Exporter"]
+        end
+    end
+
+    %% Scraping Flow
+    PromA -->|Scraping| A1
+    PromA -->|Scraping| A2
+    PromA -->|Scraping| KubeStateA
+    PromA -->|Scraping| CadvisorA
+    PromA -->|Scraping| NodeExpA
+
+    PromB -->|Scraping| B1
+    PromB -->|Scraping| B2
+    PromB -->|Scraping| KubeStateB
+    PromB -->|Scraping| CadvisorB
+    PromB -->|Scraping| NodeExpB
+
+    %% Sidecar Upload
+    SidecarA --> StoreGW
+    SidecarB --> StoreGW
+
+    %% Object Storage
+    StoreGW --> Bucket
+    Compactor --> Bucket
+    Querier --> StoreGW
+    Querier --> Bucket
+
+    %% Queries
+    GQuery --> Querier
+
 
 ```
 

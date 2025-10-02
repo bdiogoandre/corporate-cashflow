@@ -133,12 +133,14 @@ graph TD;
 
 ## 🏗️ System Design
 
+**Ambiente:** Cluster Kubernetes para orquestrar os containers e garantir a escalabilidade horizontal.
 Abaixo uma apresentação do System Design com elementos utilizados e outros que podem fazer parte em um ambiente de produção real. Items que não foram utilizados na solução estão marcados como <span style="color:#aa0000">**(Não utilizado)**</span>
 
 ### Componentes Principais
 
 - **Firewall / WAF**: protege contra ataques DDoS e tráfego malicioso <span style="color:#aa0000">**(Não utilizado)**</span>.
 - **API Gateway**: centraliza autenticação, autorização e controle de tráfego. <span style="color:#aa0000">**(Não utilizado)**</span>.
+- **Load Balancer**: Para balancear a carga de requisições <span style="color:#aa0000">**(Não utilizado)**</span>.
 - **Identity API**
 - **CashFlow API**: recebe e grava transações, publica eventos no Kafka.  
 - **Transaction Consumer**: processa eventos do Kafka, consolida saldo diário no banco de dados.  
@@ -152,8 +154,10 @@ Abaixo uma apresentação do System Design com elementos utilizados e outros que
 flowchart TD
     User([Usuário]) --> FW[Firewall / WAF] --> APIGW[API Gateway]
 
-    APIGW -->|REST/JSON| IdentityAPI[Identity API]
-    APIGW -->|REST/JSON| CashFlowAPI[CashFlow API]
+    %% APIs com ALB dedicado
+    APIGW -->|REST/JSON| ALBIdentity[ALB - Identity API] --> IdentityAPI[Identity API]
+    APIGW -->|REST/JSON| ALBCashFlow[ALB - CashFlow API] --> CashFlowAPI[CashFlow API (Write)]
+    APIGW -->|REST/JSON| ALBBalance[ALB - Balance API] --> BalanceAPI[Balance API (Read)]
 
     %% Event Sourcing Write Flow
     CashFlowAPI -->|Grava Evento| EventStore[(PostgreSQL - Event Store)]
@@ -162,6 +166,9 @@ flowchart TD
     %% Consumers
     Kafka -->|Consome Evento| Consumer[Transaction Consumer]
     Consumer -->|Atualiza| ConsolidatedDB[(PostgreSQL - Saldos Consolidados)]
+
+    %% Read Flow
+    BalanceAPI -->|Consulta| ConsolidatedDB
 
     %% Observabilidade
     subgraph Aspire[.NET Aspire Dashboard]
@@ -172,10 +179,12 @@ flowchart TD
 
     IdentityAPI --> Aspire
     CashFlowAPI --> Aspire
+    BalanceAPI --> Aspire
     Consumer --> Aspire
     Kafka --> Aspire
     EventStore --> Aspire
     ConsolidatedDB --> Aspire
+
 ````
 
 ## ✅ Próximas Melhorias

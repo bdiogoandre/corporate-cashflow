@@ -169,10 +169,7 @@ flowchart TD
     Consumer[Transaction Consumer]
     ConsolidatedDB[PostgreSQL - Saldos Consolidados]
 
-    Aspire[Grafana]
-    Logs[Logs - Loki]
-    Metrics[Métricas - Prometheus]
-    Traces[Traces - Tempo]
+    Aspire[Grafana - Loki; Prometheus; Tempo]
 
     %% Links (cada conexão em sua própria linha)
     User --> FW
@@ -203,10 +200,6 @@ flowchart TD
     Kafka --> Aspire
     EventStore --> Aspire
     ConsolidatedDB --> Aspire
-
-    Aspire --> Logs
-    Aspire --> Metrics
-    Aspire --> Traces
 
 ````
 

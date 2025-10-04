@@ -26,6 +26,10 @@ namespace Corporate.Cashflow.Integrations.Texts
             _builder.Services.ConfigureHttpClientDefaults(clientBuilder =>
             {
                 clientBuilder.AddStandardResilienceHandler();
+                clientBuilder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                });
             });
 
             _app = await _builder.BuildAsync(cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);

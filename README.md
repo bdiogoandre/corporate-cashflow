@@ -146,7 +146,7 @@ Abaixo uma apresentação do System Design com elementos utilizados e outros que
 - **Transaction Consumer**: processa eventos do Kafka, consolida saldo diário no banco de dados.  
 - **Event Store**
 - **Consolidated DB**
-- **.NET Aspire**: orquestra serviços distribuídos, coleta métricas, logs e traces distribuídos para observabilidade.  
+- **.NET Aspire**: orquestra serviços distribuídos, coleta métricas, logs e traces distribuídos para observabilidade. No desenho representado pela stack Loki, Tempo e Prometheus com Grafana.
 
 ```mermaid
 flowchart TD
@@ -169,10 +169,7 @@ flowchart TD
     Consumer[Transaction Consumer]
     ConsolidatedDB[PostgreSQL - Saldos Consolidados]
 
-    Aspire[Grafana]
-    Logs[Logs - Loki]
-    Metrics[Métricas - Prometheus]
-    Traces[Traces - Jaeger]
+    Aspire[Grafana - Loki; Prometheus; Tempo]
 
     %% Links (cada conexão em sua própria linha)
     User --> FW
@@ -203,10 +200,6 @@ flowchart TD
     Kafka --> Aspire
     EventStore --> Aspire
     ConsolidatedDB --> Aspire
-
-    Aspire --> Logs
-    Aspire --> Metrics
-    Aspire --> Traces
 
 ````
 
